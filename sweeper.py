@@ -1,27 +1,39 @@
 import random
 
 '''
-Work on:
-
-Presentation-related stuff
- * spacing
- * clarify instructions ("help" part for instance)
- 
-Win state
+Tell player how many revealed squares (out of possible to reveal)
+Playtest and choose different n if necessary (in create_grid function)
 '''
-# ====================
+
+print("To play, call play().")
+
+
+class Square:
+    '''
+    Fields:
+     * is_revealed (Bool)
+     * has_bomb (Bool)
+     * is_flagged (Bool)
+    '''
+    def __init__(self, rev, bomb, flag):
+        self.is_revealed = rev
+        self.has_bomb = bomb
+        self.is_flagged = flag
+
+    def __repr__(self):
+        print("Is revealed: {0}\n".format(self.is_revealed) +\
+              "Has bomb: {0}\n".format(self.has_bomb) +\
+              "Flagged: {0}".format(self.is_flagged))
+
 
 '''
-A Grid is a (listof (listof [Bool Bool Bool])), where
+A Grid is a (listof (listof Square), where
   * each sublist is of the same length
   * the sublists are of the same length as the full list itself
     (that is, it represents a square grid)
-  * the first boolean value represents whether or not the square
-    has been revealed
-  * the second boolean value represents whether or not it has a bomb
-  * the third boolean value represents whether or not the square was flagged
 '''
 
+# ===============================================
 
 def adj_with_bombs(G,x,y):
     '''
@@ -41,7 +53,7 @@ def adj_with_bombs(G,x,y):
         pos_x = pos[0]
         pos_y = pos[1]
         if pos_x in range(dim) and pos_y in range(dim) and \
-           G[pos_y][pos_x][1]:
+           G[pos_y][pos_x].has_bomb:
             num_bombs += 1
 
     return num_bombs
@@ -81,14 +93,14 @@ def print_grid(G):
             
             s = s + "|"
             
-            if G[y][x][0]:
+            if G[y][x].is_revealed:
 
                 flag_char = " "
 
-                if G[y][x][2]:
+                if G[y][x].is_flagged:
                     flag_char = "*"
             
-                if G[y][x][1]: # bomb revealed
+                if G[y][x].has_bomb:
                     s = s + "XX"
                 else:
                     adj_bombs = adj_with_bombs(G,x,y)
@@ -99,7 +111,7 @@ def print_grid(G):
             
             else:
                 
-                if G[y][x][2]: # flagged
+                if G[y][x].is_flagged:
                     s = s + "* "
                 else:
                     s = s + "  "
@@ -134,10 +146,10 @@ def create_grid(dim,n=0.15):
         x=0
         sub = []
         while x<dim:
-            if random.random() <= n:
-                sub.append([False, True, False])
+            if random.random() <= n: # Initialize with bomb
+                sub.append(Square(False, True, False))
             else:
-                sub.append([False, False, False])
+                sub.append(Square(False, False, False))
             x+=1
         g.append(sub)
         y+=1
@@ -160,17 +172,17 @@ def reveal(G, in_x, in_y):
     x = in_x - 1
     y = dim - in_y
 
-    if G[y][x][1]:
-        G[y][x][0] = True
+    if G[y][x].has_bomb:
+        G[y][x].is_revealed = True
         return "bomb revealed"
 
     elif adj_with_bombs(G,x,y)!=0:
-        G[y][x][0] = True
+        G[y][x].is_revealed = True
         return
 
     else:
     
-        G[y][x][0] = True
+        G[y][x].is_revealed = True
         adjacent = [ [in_x-1, in_y-1], [in_x, in_y-1], [in_x+1, in_y-1],
                      [in_x-1, in_y],                   [in_x+1, in_y],
                      [in_x-1, in_y+1], [in_x, in_y+1], [in_x+1, in_y+1] ]
@@ -178,7 +190,7 @@ def reveal(G, in_x, in_y):
                                               and 1<=pos[1]<=dim,
                                   adjacent))
         adj_notrevealed = list(
-            filter(lambda pos: not G[dim-pos[1]][pos[0]-1][0],
+            filter(lambda pos: not G[dim-pos[1]][pos[0]-1].is_revealed,
                    adj_inrange))
         for pos in adj_notrevealed:
             reveal(G, pos[0], pos[1])
@@ -217,39 +229,42 @@ def play():
                 "denotes the column number and y denotes the row number.\n"+\
                 "For instance, 1,15 denotes the upper left corner on\n"+\
                 "a 15x15 grid.\n\n" +\
-                "If you reveal a square with a bomb, it's game over.\n\n" +\
+                "If you reveal a square with a bomb, it's game over.\n\n"
+    how_to_play +=\
                 "COMMANDS:\n\n" +\
-                " * To reprint the grid, enter 'grid'.\n"+\
-                " * To quit, enter 'quit'.\n"+\
+                " * To see these instructions again later, enter 'help'.\n" +\
                 " * To flag a square, enter your coordinate preceded by 'flag'\n"+\
                 "   ('flag 1,1').\n"+\
                 " * To unflag a square, enter your coordinate preceded by\n"+\
-                "   'unflag' ('unflag 1,1').\n"+\
-                " * To see the meaning of a symbol on the grid, enter 'symbols'.\n\n"+\
-                " * If you need to see these instructions again later,\n" +\
-                "   enter 'help'.\n\n"
-    gamestart_msg = \
-                  "~~~~~~~~~~~~~~~~~~~~~~~\n\n"+\
+                "   'unflag' ('unflag 1,1').\n" +\
+                " * To reprint the grid, enter 'grid'.\n"+\
+                " * To see the meaning of a symbol on the grid, enter "+\
+                "'symbols'.\n" +\
+                " * To quit, enter 'quit'.\n\n"
+    gamestart_msg =\
+                  "\n~~~~~~~~~~~~~~~~~~~~~~~\n\n"+\
                   "Default grid size is 15x15.\n\n" +\
                   "To choose a different grid size, enter a natural number\n" +\
                   "greater than or equal to 2. The grid will be of size nxn,\n" +\
                   "where n is your inputted number of choice. Excessively\n" +\
                   "large numbers are not recommended, as the grid may be\n"+\
-                  "printed weirdly (this is a text based game).\n\n"+\
+                  "printed weirdly (this is a text based game, after all).\n\n"+\
                   "To proceed with the default size, press enter (or\n"+\
                   "enter anything else that isn't a natural number).\n\n"
     improper_coord_msg = \
                        "\nThe coordinate must be of the form 'x, y', where\n" +\
-                       "x and y are natural numbers.\n"
+                       "x and y are natural numbers.\n\n"+\
+                       "To flag a square (eg. 1,1), enter 'flag 1,1'. To \n"+\
+                       "unflag the square 1,1, enter 'unflag 1,1'.\n"
     coord_outofrange_msg = \
                          "\nThat coordinate was out of range.\n"
     symbols_msg = \
-                " * -- Flagged square\n"+\
-                " - -- No bombs in adjacent squares\n"+\
-                " 2 -- 2 adjacent squares have a bomb\n"+\
-                "XX -- Revealed square has a bomb\n"
+                " * : Flagged square\n"+\
+                " - : No adjacent squares have a bomb\n"+\
+                " 2 : 2 adjacent squares have a bomb\n"+\
+                "XX : Revealed square has a bomb\n"
     
-    preready = input(how_to_play + "(Press enter to continue)\n")
+    preready = input(how_to_play + "(Press enter to continue)")
     
     ready = input(gamestart_msg)
     
@@ -258,7 +273,7 @@ def play():
         if int(ready) < 2:
             ready = input(
                 "\nUnfortunately that'd be too trivial, choose something\n"+\
-                "else (or enter anything that isn't a natural number to\n"+\
+                "higher (or enter anything that isn't a natural number to\n"+\
                 "stick with 15x15 instead): ")
         
         elif 25 <= int(ready) < 50:
@@ -286,7 +301,7 @@ def play():
             while check.lower()!="y" and check.lower()!="n":
                 check = input(
                     "\nSay again? Are you sure you want to play with "+\
-                    "a grid size of {0}x{0}? (Enter 'y' or 'n') "\
+                    "a grid size of {0}x{0}?\n(Enter 'y' or 'n') "\
                     .format(int(ready)))
             
             if check.lower()=="y":
@@ -317,9 +332,9 @@ def play():
 
         if coord.lower()=="help":
             print(how_to_play)
-            
+        
         elif coord.lower()=="quit":
-            print("Goodbye.")
+            print("Bye.")
             return
         
         elif coord.lower()=="grid":
@@ -337,7 +352,7 @@ def play():
         else: # Using the function convert won't result in an error
 
             flag_intent = coord[:4].lower()
-            unflag_intent = coord[:6]
+            unflag_intent = coord[:6].lower()
             
             if flag_intent=="flag":
                 cstrlist = convert(coord[4:].lstrip())
@@ -361,15 +376,15 @@ def play():
 
                 elif flag_intent!="flag" and unflag_intent!="unflag":
                     # Coordinate valid, not flagging/unflagging
-
                     flag = reveal(G, in_x, in_y)
                     
                     if flag=="bomb revealed":
                         y = 0
+                        # Reveal all bombs for player
                         while y<dim:
                             x=0
                             while x<dim:
-                                if G[y][x][1]: # has bomb
+                                if G[y][x].has_bomb:
                                     reveal(G,x+1,dim-y) # "in" format
                                 x+=1
                             y+=1
@@ -383,13 +398,13 @@ def play():
 
                 elif flag_intent=="flag":
 
-                    G[dim-in_y][in_x-1][2] = True
+                    G[dim-in_y][in_x-1].is_flagged = True
                     print("\n")
                     print_grid(G)
 
                 else:
 
-                    G[dim-in_y][in_x-1][2] = False
+                    G[dim-in_y][in_x-1].is_flagged = False
                     print("\n")
                     print_grid(G)
 
