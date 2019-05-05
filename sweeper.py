@@ -2,7 +2,6 @@ import random
 
 '''
 Tell player how many revealed squares (out of possible to reveal)
-Playtest and choose different n if necessary (in create_grid function)
 '''
 
 print("To play, call play().")
@@ -128,7 +127,7 @@ def print_grid(G):
     print(s)
 
 
-def create_grid(dim,n=0.15):
+def create_grid(dim,n=0.17):
     '''
     Returns a grid of dimension dim*dim. n is a float between 0 and 1
     that is involved in the calculation of whether or not a space has
@@ -216,19 +215,51 @@ def play():
         convert: Str -> (list Nat Nat)
         '''
         strlist = in_str.split(",")
-        strlist[0] = strlist[0]
+        strlist[0] = strlist[0].rstrip()
         strlist[1] = strlist[1].lstrip()
         return strlist
+
+    def num_revealed(G):
+        '''
+        Returns a list of the form [revealed, possible] where revealed
+        represents the number of squares without bombs that were revealed
+        in G, and possible represents the number of squares without bombs
+        in G.
+
+        num_revealed: Grid -> (list Nat Nat)
+        '''
+        rev, pos = 0,0
+        dim = len(G)
+
+        y=0
+        
+        while y<dim:
+            
+            x=0
+            
+            while x<dim:
+                
+                if not G[y][x].has_bomb:
+                    if G[y][x].is_revealed:
+                        rev += 1
+                    pos += 1
+
+                x+=1
+
+            y+=1
+
+        return [rev,pos]
+    
     
     dim = 15
     
     how_to_play = \
                 "\nHOW TO PLAY:\n\n" +\
                 "Enter the coordinates of the square you want to reveal.\n\n" +\
-                "The coordinates should be of the form 'x, y', where x \n"+\
+                "The coordinates should be of the form 'x,y', where x \n"+\
                 "denotes the column number and y denotes the row number.\n"+\
-                "For instance, 1,15 denotes the upper left corner on\n"+\
-                "a 15x15 grid.\n\n" +\
+                "For instance, 1,2 denotes the upper left corner on\n"+\
+                "a 2x2 grid.\n\n" +\
                 "If you reveal a square with a bomb, it's game over.\n\n"
     how_to_play +=\
                 "COMMANDS:\n\n" +\
@@ -252,7 +283,7 @@ def play():
                   "To proceed with the default size, press enter (or\n"+\
                   "enter anything else that isn't a natural number).\n\n"
     improper_coord_msg = \
-                       "\nThe coordinate must be of the form 'x, y', where\n" +\
+                       "\nThe coordinate must be of the form 'x,y', where\n" +\
                        "x and y are natural numbers.\n\n"+\
                        "To flag a square (eg. 1,1), enter 'flag 1,1'. To \n"+\
                        "unflag the square 1,1, enter 'unflag 1,1'.\n"
@@ -264,9 +295,9 @@ def play():
                 " 2 : 2 adjacent squares have a bomb\n"+\
                 "XX : Revealed square has a bomb\n"
     
-    preready = input(how_to_play + "(Press enter to continue)")
+    ready = input(how_to_play + "(Press enter to continue)")
     
-    ready = input(gamestart_msg)
+    ready = input(gamestart_msg).lstrip().rstrip()
     
     while ready.isnumeric():
 
@@ -274,47 +305,52 @@ def play():
             ready = input(
                 "\nUnfortunately that'd be too trivial, choose something\n"+\
                 "higher (or enter anything that isn't a natural number to\n"+\
-                "stick with 15x15 instead): ")
+                "stick with 15x15 instead): ")\
+                .lstrip().rstrip()
         
         elif 25 <= int(ready) < 50:
             
             check = input(
-                "\nThat's a pretty large number, are you sure? (y/n) ")
+                "\nThat's a pretty large number, are you sure? (y/n) ")\
+                .lstrip().rstrip()
             
             while check.lower()!="y" and check.lower()!="n":
                 check = input(
                     "\nSay again? Are you sure you want to play with "+\
                     "a grid size of {0}x{0}?\n(Enter 'y' or 'n') "\
-                    .format(int(ready)))
+                    .format(int(ready)))\
+                    .lstrip().rstrip()
                 
             if check.lower()=="y":
                 dim = int(ready)
                 ready = ""
             else:
-                ready = input(gamestart_msg)
+                ready = input(gamestart_msg).lstrip().rstrip()
         
         elif 50<=int(ready)<100:
             
             check = input(
-                "\nThat's a REALLY large number, are you sure? (y/n) ")
+                "\nThat's a REALLY large number, are you sure? (y/n) ")\
+                .lstrip().rstrip()
             
             while check.lower()!="y" and check.lower()!="n":
                 check = input(
                     "\nSay again? Are you sure you want to play with "+\
                     "a grid size of {0}x{0}?\n(Enter 'y' or 'n') "\
-                    .format(int(ready)))
+                    .format(int(ready)))\
+                    .lstrip().rstrip()
             
             if check.lower()=="y":
                 dim = int(ready)
                 ready = ""
             else:
-                ready = input(gamestart_msg)
+                ready = input(gamestart_msg).lstrip().rstrip()
 
         elif int(ready) >= 100:
             ready = input(
                 "\nOkay that's a little ridiculous, choose something lower\n" +\
                 "than that, please (or just enter anything that isn't a\n"+\
-                "natural number for a 15x15 board): ")
+                "natural number for a 15x15 board): ").lstrip().rstrip()
         
         else:
             dim = int(ready)
@@ -324,9 +360,7 @@ def play():
     print("\n~~~~~~~~~~~~~~~~~\n\n")
     print_grid(G)
     
-    coord = input()
-    coord = coord.lstrip()
-    coord = coord.rstrip()
+    coord = input().lstrip().rstrip()
 
     while True:
 
@@ -390,7 +424,18 @@ def play():
                             y+=1
                         print("\n{0},{1} had a bomb.\n".format(in_x,in_y))
                         print_grid(G)
-                        print("Game over!")
+                        print("Game over!\n")
+
+                        results = num_revealed(G)
+                        rev, pos = results[0], results[1]
+                        percent = (rev/pos)*100
+                        percent = round(percent, 1)
+                        print(
+                            "You revealed {0} out of {1} squares, "\
+                            .format(rev,pos)+\
+                            "earning you\n"+\
+                            "a score of {0}%.".format(percent))
+                        
                         return
 
                     print("\n")
@@ -408,6 +453,4 @@ def play():
                     print("\n")
                     print_grid(G)
 
-        coord = input()
-        coord = coord.lstrip()
-        coord = coord.rstrip()
+        coord = input().lstrip().rstrip()
