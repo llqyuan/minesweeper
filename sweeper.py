@@ -20,9 +20,9 @@ class Square:
         self.is_flagged = flag
 
     def __repr__(self):
-        return "Is revealed: {0}\n".format(str(self.is_revealed)) +\
-               "Has bomb: {0}\n".format(str(self.has_bomb)) +\
-               "Flagged: {0}".format(str(self.is_flagged))
+        return "Is revealed: {0}\n".format(self.is_revealed) +\
+               "Has bomb: {0}\n".format(self.has_bomb) +\
+               "Flagged: {0}".format(self.is_flagged)
 
 
 '''
