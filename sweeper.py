@@ -1,9 +1,5 @@
 import random
 
-'''
-Tell player how many revealed squares (out of possible to reveal)
-'''
-
 print("To play, call play().")
 
 
@@ -20,9 +16,9 @@ class Square:
         self.is_flagged = flag
 
     def __repr__(self):
-        return "Is revealed: {0}\n".format(self.is_revealed) +\
-               "Has bomb: {0}\n".format(self.has_bomb) +\
-               "Flagged: {0}".format(self.is_flagged)
+        return "<rev, bomb, flag>"+\
+               ": <{0.is_revealed}, {0.has_bomb}, {0.is_flagged}>"\
+               .format(self)
 
 
 '''
@@ -127,7 +123,7 @@ def print_grid(G):
     print(s)
 
 
-def create_grid(dim,n=0.17):
+def create_grid(dim,n=0.16):
     '''
     Returns a grid of dimension dim*dim. n is a float between 0 and 1
     that is involved in the calculation of whether or not a space has
@@ -409,7 +405,7 @@ def play():
 
 
                 elif flag_intent!="flag" and unflag_intent!="unflag":
-                    # Coordinate valid, not flagging/unflagging
+
                     flag = reveal(G, in_x, in_y)
                     
                     if flag=="bomb revealed":
@@ -438,8 +434,23 @@ def play():
                         
                         return
 
+
+                    # Alternate ending: all possible squares revealed
+                    
+                    results = num_revealed(G)
+                    rev, pos = results[0], results[1]
+                    if rev==pos:
+                        print_grid(G)
+                        print("You revealed all {0} out of {1} bombless "\
+                              .format(rev,pos)+\
+                              "squares, earning you\n"+\
+                              "a score of 100%. Congratulations.")
+                        return
+
+
                     print("\n")
                     print_grid(G)
+
 
                 elif flag_intent=="flag":
 
