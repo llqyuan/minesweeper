@@ -418,8 +418,8 @@ def play():
                                     reveal(G,x+1,dim-y) # "in" format
                                 x+=1
                             y+=1
-                        print("\n{0},{1} had a bomb.\n".format(in_x,in_y))
                         print_grid(G)
+                        print("\n{0},{1} had a bomb.".format(in_x,in_y),end=" ")
                         print("Game over!\n")
 
                         results = num_revealed(G)
