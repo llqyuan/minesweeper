@@ -427,7 +427,7 @@ def play():
                         percent = (rev/pos)*100
                         percent = round(percent, 1)
                         print(
-                            "You revealed {0} out of {1} squares, "\
+                            "You revealed {0} out of {1} bombless squares, "\
                             .format(rev,pos)+\
                             "earning you\n"+\
                             "a score of {0}%.".format(percent))
