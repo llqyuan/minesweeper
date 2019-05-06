@@ -191,7 +191,18 @@ def reveal(G, in_x, in_y):
             reveal(G, pos[0], pos[1])
 
 
-def play():
+def play(is_retry=False):
+
+    '''
+    Executes the game. is_retry indicates whether or not the function
+    was called through a replay of the game.
+
+    Effects:
+    * Reads from the keyboard
+    * Prints to the screen
+
+    play: Bool -> None
+    '''
 
     def num_atleast_2(s):
         '''
@@ -245,6 +256,25 @@ def play():
             y+=1
 
         return [rev,pos]
+
+    def try_replay():
+        '''
+        Calls play(is_retry=True) if the player indicates that they
+        wish to play again.
+
+        Effects:
+        * Reads from the keyboard
+        * Prints to the screen
+
+        try_replay: None -> None
+        '''
+        retry = input("Want to play again? (y/n) ").lower()
+        while retry!="y" and retry!="n":
+            retry = input(
+                "Enter 'y' or 'n', do you want to play again? ")
+        if retry=="y":
+            play(is_retry=True)
+        return
     
     
     dim = 15
@@ -290,8 +320,9 @@ def play():
                 " - : No adjacent squares have a bomb\n"+\
                 " 2 : 2 adjacent squares have a bomb\n"+\
                 "XX : Revealed square has a bomb\n"
-    
-    ready = input(how_to_play + "(Press enter to continue)")
+
+    if not is_retry:
+        ready = input(how_to_play + "(Press enter to continue)")
     
     ready = input(gamestart_msg).lstrip().rstrip()
     
@@ -424,16 +455,22 @@ def play():
 
                         results = num_revealed(G)
                         rev, pos = results[0], results[1]
-                        percent = (rev/pos)*100
-                        percent = round(percent, 1)
-                        print(
-                            "You revealed {0} out of {1} bombless squares, "\
-                            .format(rev,pos)+\
-                            "earning you\n"+\
-                            "a score of {0}%.".format(percent))
-                        
-                        return
+                        if pos!=0:
+                            percent = (rev/pos)*100
+                            percent = round(percent, 1)
+                            print(
+                                "You revealed {0} out of {1} bombless squares, "\
+                                .format(rev,pos)+\
+                                "earning you\n"+\
+                                "a score of {0}%.\n".format(percent))
+                        else:
+                            print(
+                                "Somehow, you were so unlucky that every single"+\
+                                " square had a bomb.\n"+\
+                                "This was unwinnable. Sorry!\n")
 
+                        try_replay()
+                        return
 
                     # Alternate ending: all possible squares revealed
                     
@@ -444,7 +481,8 @@ def play():
                         print("You revealed all {0} out of {1} bombless "\
                               .format(rev,pos)+\
                               "squares, earning you\n"+\
-                              "a score of 100%. Congratulations.")
+                              "a score of 100%. Congratulations.\n")
+                        try_replay()
                         return
 
 
