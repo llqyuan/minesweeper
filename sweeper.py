@@ -278,6 +278,15 @@ def play(is_retry=False):
     
     
     dim = 15
+
+    test_font = "This is a text-based game.\n\n"+\
+                "+--+--+--+--+--+\n"+\
+                "|  |  |  |  |  |\n"+\
+                "+--+--+--+--+--+\n\n"+\
+                "The above shape should look like a line of five squares.\n"+\
+                "If you do not see the shape, please change your font\n"+\
+                "accordingly (Deja Vu Sans Mono is a good bet).\n\n"+\
+                "Press enter when you are ready.\n"
     
     how_to_play = \
                 "\nHOW TO PLAY:\n\n" +\
@@ -322,6 +331,7 @@ def play(is_retry=False):
                 "XX : Revealed square has a bomb\n"
 
     if not is_retry:
+        ready = input(test_font)
         ready = input(how_to_play + "(Press enter to continue)")
     
     ready = input(gamestart_msg).lstrip().rstrip()
