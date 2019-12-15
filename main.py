@@ -132,6 +132,11 @@ class Minesweeper:
                     command = input().strip()
                     continue
 
+                elif command.lower() == "symbols":
+                    print(SYMBOLS_MSG)
+                    command = input().strip()
+                    continue
+
                 elif "," not in command:
                     print(IMPROPER_COORD_MSG)
                     command = input().strip()
