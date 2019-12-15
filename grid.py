@@ -81,10 +81,16 @@ class Grid(Object):
         self.possible = 0
 
 
-    def create_new_grid(self, dim, n=0.16):
-        self.dim = dim
+    def create_new_grid(self, n=0.16):
+        """
+        Sets self.gridlist to a newly generated grid of dimension self.dim. Each square has a
+        probability n of having a bomb.
+
+        :param n: float
+        :return: None
+        """
         grid = []
-        for i in range(dim * dim):
+        for i in range(self.dim * self.dim):
             grid.append(Square(False,
                                True if random.random() <= n else False,
                                False))
@@ -92,6 +98,9 @@ class Grid(Object):
 
 
     def read_and_store_preferred_grid_dimension(self):
+        """
+        Reads input and sets self.dim.
+        """
         global INIT_GRID_SIZE_MSG
         ready = input(INIT_GRID_SIZE_MSG).strip()
         self.dim = 15
@@ -154,6 +163,10 @@ class Grid(Object):
 
 
     def initialize_game(self):
+        """
+        Initializes the game by reading and storing the player's preferred grid
+        dimension, and creating the new grid. Also resets self.possible and self.revealed.
+        """
         if not self.is_retry:
             global CHECK_FONT_MSG
             global HOW_TO_PLAY_MSG
@@ -162,13 +175,18 @@ class Grid(Object):
 
         self.read_and_store_preferred_grid_dimension()
         self.create_new_grid()
-        
+
+        self.possible = 0
+        self.revealed = 0
         for square in self.gridlist:
             if not square.has_bomb:
                 self.possible += 1
 
 
     def print_grid(self):
+        """
+        Prints the grid.
+        """
         s = ""
 
         column_label = "    "
@@ -241,6 +259,15 @@ class Grid(Object):
 
 
     def reveal(self, xpos, ypos):
+        """
+        Reveals the position at xpos, ypos (0,0 at upper left).
+        If there are no bombs in adjacent squares,recursively reveals adjacent
+        spaces. If the position being revealed has a bomb, returns "bomb revealed".
+
+        :param xpos: int. Must be in range
+        :param ypos: int. Must be in range
+        :return: string or None
+        """
         self.gridlist[ypos * self.dim + xpos].is_revealed = True
 
         if self.gridlist[ypos * self.dim + xpos].has_bomb:
