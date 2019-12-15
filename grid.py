@@ -277,7 +277,8 @@ class Grid:
         Reveals the position at xpos, ypos (0,0 at upper left).
         If there are no bombs in adjacent squares,recursively reveals adjacent
         spaces. If the position being revealed has a bomb, returns "bomb revealed".
-        Increments self.revealed (for revealed bombless squares) by 1.
+        If this space is bombless and hasn't yet been revealed,
+        increments self.revealed (for revealed bombless squares) by 1.
 
         :param xpos: int. Must be in range
         :param ypos: int. Must be in range
