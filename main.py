@@ -1,9 +1,12 @@
 from grid import *
+import random
 
 
 class Minesweeper:
     def __init__(self):
         self.grid = Grid()
+        self.allowed_hints = 0
+        self.given_hints = 0
 
 
     def _num_atleast_2(self, string):
@@ -63,7 +66,16 @@ class Minesweeper:
 
         return flag_intent, unflag_intent, split_list
 
-    def _show_results(self):
+    def _reveal_all_bombs(self):
+        """
+        Reveals all squares with bombs.
+        """
+        pos = 0
+        for square in self.grid.gridlist:
+            if square.has_bomb:
+                square.is_revealed = True
+
+    def show_results(self):
         """
         Assumes the game has ended. Shows the results to the player.
 
@@ -80,9 +92,12 @@ class Minesweeper:
                 "You revealed {} out of {} bombless squares, "
                 "earning you \na score of {}%.\n"
                 .format(self.grid.revealed, self.grid.possible, percent))
+            if self.allowed_hints:
+                print("You used {} hint(s) out of {}.\n"
+                      .format(self.given_hints, self.allowed_hints))
 
 
-    def _try_replay(self):
+    def try_replay(self):
         """
         Prompts the player for a replay. Returns True if the player
         wishes to replay and False otherwise.
@@ -101,6 +116,84 @@ class Minesweeper:
             return False
 
 
+    def set_hints(self):
+        """
+        Assuming the game board has been fully initialized, sets the number
+        of allowed hints (self.allowed_hints) based on board size and resets
+        self.given_hints to 0.
+        """
+        self.given_hints = 0
+        self.allowed_hints = 0
+        
+        if 6 <= self.grid.dim < 9:
+            self.allowed_hints = 1
+
+        elif 9 <= self.grid.dim < 13:
+            self.allowed_hints = 2
+
+        elif self.grid.dim >= 13:
+            self.allowed_hints = 3
+
+
+    def _process_hint(self):
+        """
+        Reveals one random unrevealed square that doesn't have a bomb, unless
+        there are no unrevealed bombless squares left (in the case where
+        somehow all squares have initialized with bombs), in which case
+        all bombs will be revealed before exiting the function. Helper
+        for show_hints.
+        """
+        index = 0
+        bombless_unrevealed = []
+        
+        while index < self.grid.dim * self.grid.dim:
+            if not self.grid.gridlist[index].has_bomb and \
+               not self.grid.gridlist[index].is_revealed:
+                bombless_unrevealed.append(index)
+            index += 1
+            
+        if len(bombless_unrevealed) == 0:
+            self._reveal_all_bombs()
+            return
+
+        to_reveal = random.choice(bombless_unrevealed)
+        self.grid.reveal(to_reveal % self.grid.dim, to_reveal // self.grid.dim)
+
+
+    def show_hints(self):
+        """
+        Asks the player if they wish to see a hint. If they say yes and
+        it is allowed, reveals one random unrevealed square without a bomb in
+        it.
+        """
+        if self.allowed_hints == 0:
+            print("\nHints are not given for a board of this size.\n")
+
+        elif self.allowed_hints - self.given_hints <= 0:
+            print("\nYou have used all available hints and no more hints will \n"
+                  "be given.\n")
+
+        else:
+            show = input(
+                "You have {} hint(s) left out of a total of {}. You may \n"
+                "receive a hint and reveal a random bombless square if \n"
+                "you wish.\n\n"
+                "Show hint? (y/n) "
+                .format(self.allowed_hints - self.given_hints,
+                        self.allowed_hints)).lower()
+
+            while show != "y" and show != "n":
+                show = input(
+                    "I didn't understand that. Show hint? (y/n) ").lower()
+
+            if show == "y":
+                self._process_hint()
+                self.given_hints += 1
+
+            print("\n")
+            self.grid.print_grid()
+
+
     def play(self):
         """
         Play the game.
@@ -112,6 +205,7 @@ class Minesweeper:
             self.grid.initialize_game()
             print("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n")
             self.grid.print_grid()
+            self.set_hints()
             
             command = input().strip()
 
@@ -134,6 +228,15 @@ class Minesweeper:
 
                 elif command.lower() == "symbols":
                     print(SYMBOLS_MSG)
+                    command = input().strip()
+                    continue
+
+                elif command.lower() == "hint":
+                    self.show_hints()
+                    if self.grid.revealed == self.grid.possible:
+                        self.show_results()
+                        continue_playing = self.try_replay()
+                        break
                     command = input().strip()
                     continue
 
@@ -171,25 +274,21 @@ class Minesweeper:
                 bomb = self.grid.reveal(x_input - 1, self.grid.dim - y_input)
 
                 if bomb:
-                    pos = 0
-                    while pos < self.grid.dim * self.grid.dim:
-                        if self.grid.gridlist[pos].has_bomb:
-                            self.grid.gridlist[pos].is_revealed = True
-                        pos += 1
-
+                    self._reveal_all_bombs()
                     self.grid.print_grid()
+                    
                     print("\n{}, {} had a bomb. Game over!"
                           .format(x_input, y_input))
 
-                    self._show_results()
-                    continue_playing = self._try_replay()
+                    self.show_results()
+                    continue_playing = self.try_replay()
                     break
 
                 else:
                     if self.grid.revealed == self.grid.possible:
                         self.grid.print_grid()
-                        self._show_results()
-                        continue_playing = self._try_replay()
+                        self.show_results()
+                        continue_playing = self.try_replay()
                         break
 
                 print("\n")

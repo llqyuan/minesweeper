@@ -18,10 +18,10 @@ HOW_TO_PLAY_MSG = \
                 "For instance, 1,2 denotes the upper left corner on\n"\
                 "a 2x2 grid.\n\n"\
                 "If you reveal a square with a bomb, it's game over.\n\n"\
-                "(Press enter to continue)"
+                "(Press enter to continue)\n"
 
 COMMAND_LIST_MSG = \
-                 "COMMANDS:\n\n"\
+                 "\nCOMMANDS:\n\n"\
                 " * To see these instructions again later, enter 'help'.\n"\
                 " * To flag a square, enter your coordinate preceded by 'flag'"\
                 "\n   ('flag 1,1').\n"\
@@ -30,10 +30,11 @@ COMMAND_LIST_MSG = \
                 " * To reprint the grid, enter 'grid'.\n"\
                 " * To see the meaning of a symbol on the grid, enter "\
                 "'symbols'.\n" \
-                " * To quit, enter 'quit'.\n\n"
+                " * To quit, enter 'quit'.\n" \
+                " * To ask for a hint, enter 'hint'.\n\n"
 
 INIT_GRID_SIZE_MSG = \
-                   "\n~~~~~~~~~~~~~~~~~~~~~~~\n\n"\
+                   "~~~~~~~~~~~~~~~~~~~~~~~\n\n"\
                   "Default grid size is 15x15.\n\n" \
                   "To choose a different grid size, enter a natural number\n"\
                   "greater than or equal to 2. The grid will be of size nxn,\n" +\
@@ -176,6 +177,7 @@ class Grid:
             global HOW_TO_PLAY_MSG
             ready = input(CHECK_FONT_MSG)
             ready = input(HOW_TO_PLAY_MSG)
+            ready = input(COMMAND_LIST_MSG)
 
         self.read_and_store_preferred_grid_dimension()
         self.create_new_grid()
