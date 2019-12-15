@@ -58,7 +58,7 @@ SYMBOLS_MSG = \
             "XX : Revealed square has a bomb\n"
 
 
-class Square:
+class Square(Object):
     '''
     Fields:
      * is_revealed (Bool)
@@ -71,16 +71,18 @@ class Square:
         self.is_flagged = flag
 
 
-class Grid:
+class Grid(Object):
     
     def __init__(self):
         self.is_retry = False
         self.gridlist = None
-        self.grid_dim = None
+        self.dim = None
+        self.revealed = 0
+        self.possible = 0
 
 
     def create_new_grid(self, dim, n=0.16):
-        self.grid_dim = dim
+        self.dim = dim
         grid = []
         for i in range(dim * dim):
             grid.append(Square(False,
@@ -92,6 +94,7 @@ class Grid:
     def read_and_store_preferred_grid_dimension(self):
         global INIT_GRID_SIZE_MSG
         ready = input(INIT_GRID_SIZE_MSG).strip()
+        self.dim = 15
         
         while ready.isnumeric():
 
@@ -115,7 +118,7 @@ class Grid:
                         .strip()
 
                 if check.lower() == "y":
-                    self.grid_dim = int(ready)
+                    self.dim = int(ready)
                     break
                 
                 else:
@@ -135,7 +138,7 @@ class Grid:
                         .strip()
 
                 if check.lower() == "y":
-                    self.grid_dim = int(ready)
+                    self.dim = int(ready)
                     break
 
                 else:
@@ -143,7 +146,7 @@ class Grid:
 
             elif int(ready) >= 100:
                 ready = input(
-                    "That's a bit ridiculous, now. Choose something lower than "
+                    "That's a bit ridiculous now. Choose something lower than "
                     "that, please. (You can enter anything that isn't a natural "
                     "number at any time to proceed with the default 15x15 "
                     "board) ")\
@@ -159,6 +162,10 @@ class Grid:
 
         self.read_and_store_preferred_grid_dimension()
         self.create_new_grid()
+        
+        for square in self.gridlist:
+            if not square.has_bomb:
+                self.possible += 1
 
 
     def print_grid(self):
@@ -166,7 +173,7 @@ class Grid:
 
         column_label = "    "
         xlabel = 1
-        while xlabel <= self.grid_dim:
+        while xlabel <= self.dim:
             column_label += " " * (2 - len(str(xlabel))) # Note max 2 digits
             column_label += "{} ".format(xlabel)
             xlabel += 1
@@ -174,35 +181,36 @@ class Grid:
         s += column_label + "\n"
 
         ypos = 0
-        while ypos < self.grid_dim:
-            s += "   " + "+--" * self.grid_dim + "+\n"
-            row_label = self.grid_dim - ypos
+        while ypos < self.dim:
+            s += "   " + "+--" * self.dim + "+\n"
+            row_label = self.dim - ypos
             s += " " * (2 - len(str(row_label)))
             s += "{} ".format(row_label)
             xpos = 0
 
-            while xpos < self.grid_dim:
+            while xpos < self.dim:
 
                 s += "|"
-                if self.gridlist[ypos * self.grid_dim + xpos].is_revealed:
+                if self.gridlist[ypos * self.dim + xpos].is_revealed:
                     
-                    if self.gridlist[ypos * self.grid_dim + xpos].has_bomb:
+                    if self.gridlist[ypos * self.dim + xpos].has_bomb:
                         s += "XX"
                         
                     else:
                         num_adj_bombs = self.adj_with_bombs(xpos, ypos)
                         if num_adj_bombs == 0:
-                            s += "*-" if self.gridlist[ypos * self.grid_dim + xpos].is_flagged \
+                            s += "*-" \
+                                 if self.gridlist[ypos * self.dim + xpos].is_flagged \
                                  else " -"
                             
                         else:
                             s += "{}{}".format(
-                                "*" if self.gridlist[ypos * self.grid_dim + xpos].is_flagged
+                                "*" if self.gridlist[ypos * self.dim + xpos].is_flagged
                                 else " ",
                                 num_adj_bombs)
 
                 else:
-                    s += "* " if self.gridlist[ypos * self.grid_dim + xpos].is_flagged \
+                    s += "* " if self.gridlist[ypos * self.dim + xpos].is_flagged \
                          else "  "
 
                 xpos += 1
@@ -211,7 +219,7 @@ class Grid:
             s += " {}\n".format(row_label)
             ypos += 1
 
-        s += "   " + "+--" * self.grid_dim + "+\n"
+        s += "   " + "+--" * self.dim + "+\n"
         s += column_label + "\n"
         print(s)
 
@@ -225,17 +233,17 @@ class Grid:
         for pos in adjacent:
             x = pos[0]
             y = pos[1]
-            if x in range(self.grid_dim) and y in range(self.grid_dim) and \
-               self.gridlist[y * self.grid_dim + x].has_bomb:
+            if x in range(self.dim) and y in range(self.dim) and \
+               self.gridlist[y * self.dim + x].has_bomb:
                 num_bombs += 1
 
         return num_bombs
 
 
     def reveal(self, xpos, ypos):
-        self.gridlist[ypos * self.grid_dim + xpos].is_revealed = True
+        self.gridlist[ypos * self.dim + xpos].is_revealed = True
 
-        if self.gridlist[ypos * self.grid_dim + xpos].has_bomb:
+        if self.gridlist[ypos * self.dim + xpos].has_bomb:
             return "bomb revealed"
 
         elif self.adj_with_bombs(xpos, ypos) == 0:
@@ -247,12 +255,12 @@ class Grid:
                          (xpos - 1,  ypos + 1),
                          (xpos,      ypos + 1),
                          (xpos + 1,  ypos + 1) ]
-            adj_inrange = list(filter(lambda pos: 0 <= pos[0] < self.grid_dim \
-                                                  and 0 <= pos[1] < self.grid_dim,
+            adj_inrange = list(filter(lambda pos: 0 <= pos[0] < self.dim \
+                                                  and 0 <= pos[1] < self.dim,
                                       adjacent))
             adj_not_revealed = list(
                 filter(lambda pos:
-                       not self.gridlist[pos[1] * self.grid_dim + pos[0]].is_revealed,
+                       not self.gridlist[pos[1] * self.dim + pos[0]].is_revealed,
                        adj_inrange))
             for pos in adj_not_revealed:
                 self.reveal(pos[0], pos[1])
