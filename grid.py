@@ -79,7 +79,7 @@ class Grid:
         self.grid_dim = None
 
 
-    def create_new_grid(dim, n=0.16):
+    def create_new_grid(self, dim, n=0.16):
         self.grid_dim = dim
         grid = []
         for i in range(dim * dim):
@@ -162,13 +162,76 @@ class Grid:
 
 
     def print_grid(self):
-        pass
+        s = ""
+
+        column_label = "    "
+        xlabel = 1
+        while xlabel <= self.grid_dim:
+            column_label += " " * (2 - len(str(xlabel))) # Note max 2 digits
+            column_label += "{} ".format(xlabel)
+            xlabel += 1
+
+        s += column_label + "\n"
+
+        ypos = 0
+        while ypos < self.grid_dim:
+            s += "   " + "+--" * self.grid_dim + "+\n"
+            row_label = self.grid_dim - ypos
+            s += " " * (2 - len(str(row_label)))
+            s += "{} ".format(row_label)
+            xpos = 0
+
+            while xpos < self.grid_dim:
+
+                s += "|"
+                if self.gridlist[ypos * self.grid_dim + xpos].is_revealed:
+                    
+                    if self.gridlist[ypos * self.grid_dim + xpos].has_bomb:
+                        s += "XX"
+                        
+                    else:
+                        num_adj_bombs = self.adj_with_bombs(xpos, ypos)
+                        if num_adj_bombs == 0:
+                            s += "*-" if self.gridlist[ypos * self.grid_dim + xpos].is_flagged \
+                                 else " -"
+                            
+                        else:
+                            s += "{}{}".format(
+                                "*" if self.gridlist[ypos * self.grid_dim + xpos].is_flagged
+                                else " ",
+                                num_adj_bombs)
+
+                else:
+                    s += "* " if self.gridlist[ypos * self.grid_dim + xpos].is_flagged \
+                         else "  "
+
+                xpos += 1
+
+            s += "|"
+            s += " {}\n".format(row_label)
+            ypos += 1
+
+        s += "   " + "+--" * self.grid_dim + "+\n"
+        s += column_label + "\n"
+        print(s)
 
 
-    def adj_with_bombs(xpos, ypos):
-        pass
+    def adj_with_bombs(self, x, y):
+        adjacent = [(x-1,y-1), (x,y-1), (x+1,y-1),
+                    (x-1,y),            (x+1,y),
+                    (x-1,y+1), (x,y+1), (x+1,y+1)]
+        num_bombs = 0
+
+        for pos in adjacent:
+            x = pos[0]
+            y = pos[1]
+            if x in range(self.grid_dim) and y in range(self.grid_dim) and \
+               self.gridlist[y * self.grid_dim + x].has_bomb:
+                num_bombs += 1
+
+        return num_bombs
 
 
-    def reveal(x_input, y_input):
+    def reveal(self, x_input, y_input):
         pass
 
