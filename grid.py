@@ -58,7 +58,7 @@ SYMBOLS_MSG = \
             "XX : Revealed square has a bomb\n"
 
 
-class Square(Object):
+class Square:
     '''
     Fields:
      * is_revealed (Bool)
@@ -71,7 +71,7 @@ class Square(Object):
         self.is_flagged = flag
 
 
-class Grid(Object):
+class Grid:
     
     def __init__(self):
         self.is_retry = False
@@ -160,6 +160,10 @@ class Grid(Object):
                     "number at any time to proceed with the default 15x15 "
                     "board) ")\
                     .strip()
+
+            else:
+                self.dim = int(ready)
+                break
 
 
     def initialize_game(self):

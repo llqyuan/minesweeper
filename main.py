@@ -1,12 +1,12 @@
 from grid import *
 
 
-class Minesweeper(Object):
+class Minesweeper:
     def __init__(self):
         self.grid = Grid()
 
 
-    def _num_atleast_2(string):
+    def _num_atleast_2(self, string):
         """
         Returns True if string is numeric and represents a number at
         least 2, and False otherwise.
@@ -17,7 +17,7 @@ class Minesweeper(Object):
         return s.isnumeric() and int(s) >= 2
 
 
-    def _convert(str_input):
+    def _convert(self, str_input):
         """
         Splits str_input and returns the result.
 
@@ -29,7 +29,7 @@ class Minesweeper(Object):
         strlist[1] = strlist[1].strip()
         return strlist
 
-    def _set_flag(x_in, y_in, flag):
+    def _set_flag(self, x_in, y_in, flag):
         """
         Sets the value of is_flagged of the square at coordinate (x_in, y_in)
         to flag.
@@ -41,7 +41,7 @@ class Minesweeper(Object):
         xpos, ypos = x_in - 1, self.grid.dim - y_in
         self.grid.gridlist[ypos * self.grid.dim + xpos].is_flagged = flag
 
-    def _set_flag_intent(command):
+    def _set_flag_intent(self, command):
         """
         Determine values of flag_intent and unflag_intent, and splits the
         command into coordinates, and returns them as a tuple.
@@ -63,7 +63,7 @@ class Minesweeper(Object):
 
         return flag_intent, unflag_intent, split_list
 
-    def _show_results():
+    def _show_results(self):
         """
         Assumes the game has ended. Shows the results to the player.
 
@@ -82,7 +82,7 @@ class Minesweeper(Object):
                 .format(self.grid.revealed, self.grid.possible, percent))
 
 
-    def _try_replay():
+    def _try_replay(self):
         """
         Prompts the player for a replay. Returns True if the player
         wishes to replay and False otherwise.
@@ -101,7 +101,10 @@ class Minesweeper(Object):
             return False
 
 
-    def play():
+    def play(self):
+        """
+        Play the game.
+        """
         continue_playing = True
         
         while continue_playing:
@@ -129,7 +132,7 @@ class Minesweeper(Object):
                     command = input().strip()
                     continue
 
-                elif "," not in coord:
+                elif "," not in command:
                     print(IMPROPER_COORD_MSG)
                     command = input().strip()
                     continue
@@ -151,7 +154,7 @@ class Minesweeper(Object):
                     command = input().strip()
                     continue
 
-                elif flag_intent == "flag" or flag_intent == "unflag":
+                elif flag_intent == "flag" or unflag_intent == "unflag":
                     self._set_flag(x_input, y_input,
                                    True if flag_intent == "flag"
                                    else False)
@@ -160,9 +163,9 @@ class Minesweeper(Object):
                     command = input().strip()
                     continue
 
-                bomb = self.grid.reveal(x_input + 1, self.grid.dim - y_input)
+                bomb = self.grid.reveal(x_input - 1, self.grid.dim - y_input)
 
-                if bomb is "bomb revealed":
+                if bomb == "bomb revealed":
                     pos = 0
                     while pos < self.grid.dim * self.grid.dim:
                         if self.grid.gridlist[pos].has_bomb:
