@@ -252,12 +252,15 @@ class Grid:
                     (x-1,y+1), (x,y+1), (x+1,y+1)]
         num_bombs = 0
 
+        debug = []
+
         for pos in adjacent:
-            x = pos[0]
-            y = pos[1]
-            if x in range(self.dim) and y in range(self.dim) and \
-               self.gridlist[y * self.dim + x].has_bomb:
+            xnew = pos[0]
+            ynew = pos[1]
+            if xnew in range(self.dim) and ynew in range(self.dim) and \
+               self.gridlist[ynew * self.dim + xnew].has_bomb:
                 num_bombs += 1
+                debug.append((xnew + 1, self.dim - ynew))
 
         return num_bombs
 
@@ -267,17 +270,22 @@ class Grid:
         Reveals the position at xpos, ypos (0,0 at upper left).
         If there are no bombs in adjacent squares,recursively reveals adjacent
         spaces. If the position being revealed has a bomb, returns "bomb revealed".
+        Increments self.revealed (for revealed bombless squares) by 1.
 
         :param xpos: int. Must be in range
         :param ypos: int. Must be in range
         :return: string or None
         """
-        self.gridlist[ypos * self.dim + xpos].is_revealed = True
+        if self.gridlist[ypos * self.dim + xpos].is_revealed:
+            return
 
-        if self.gridlist[ypos * self.dim + xpos].has_bomb:
+        elif self.gridlist[ypos * self.dim + xpos].has_bomb:
             return "bomb revealed"
 
-        elif self.adj_with_bombs(xpos, ypos) == 0:
+        self.gridlist[ypos * self.dim + xpos].is_revealed = True
+        self.revealed += 1
+
+        if self.adj_with_bombs(xpos, ypos) == 0:
             adjacent = [ (xpos - 1,  ypos - 1),
                          (xpos,      ypos - 1),
                          (xpos + 1,  ypos - 1),

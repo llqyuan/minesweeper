@@ -181,8 +181,8 @@ class Minesweeper:
                     break
 
                 else:
-                    self.grid.revealed += 1
                     if self.grid.revealed == self.grid.possible:
+                        self.grid.print_grid()
                         self._show_results()
                         continue_playing = self._try_replay()
                         break
