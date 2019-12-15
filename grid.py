@@ -276,19 +276,21 @@ class Grid:
         """
         Reveals the position at xpos, ypos (0,0 at upper left).
         If there are no bombs in adjacent squares,recursively reveals adjacent
-        spaces. If the position being revealed has a bomb, returns "bomb revealed".
+        spaces. If the position being revealed has a bomb, returns True;
+        otherwise returns False.
         If this space is bombless and hasn't yet been revealed,
         increments self.revealed (for revealed bombless squares) by 1.
 
         :param xpos: int. Must be in range
         :param ypos: int. Must be in range
-        :return: string or None
+        :return: bool
         """
-        if self.gridlist[ypos * self.dim + xpos].is_revealed:
-            return
 
-        elif self.gridlist[ypos * self.dim + xpos].has_bomb:
-            return "bomb revealed"
+        if self.gridlist[ypos * self.dim + xpos].has_bomb:
+            return True
+
+        elif self.gridlist[ypos * self.dim + xpos].is_revealed:
+            return False
 
         self.gridlist[ypos * self.dim + xpos].is_revealed = True
         self.revealed += 1
@@ -311,4 +313,6 @@ class Grid:
                        adj_inrange))
             for pos in adj_not_revealed:
                 self.reveal(pos[0], pos[1])
+
+        return False
 

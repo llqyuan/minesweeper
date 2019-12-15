@@ -17,7 +17,7 @@ class Minesweeper:
         return s.isnumeric() and int(s) >= 2
 
 
-    def _convert(self, str_input):
+    def _split_str_input(self, str_input):
         """
         Splits str_input and returns the result.
 
@@ -41,7 +41,7 @@ class Minesweeper:
         xpos, ypos = x_in - 1, self.grid.dim - y_in
         self.grid.gridlist[ypos * self.grid.dim + xpos].is_flagged = flag
 
-    def _set_flag_intent(self, command):
+    def _process_flag_intent(self, command):
         """
         Determine values of flag_intent and unflag_intent, and splits the
         command into coordinates, and returns them as a tuple.
@@ -53,13 +53,13 @@ class Minesweeper:
         unflag_intent = command[:6].lower()
 
         if flag_intent == "flag":
-            split_list = self._convert(command[4:].lstrip())
+            split_list = self._split_str_input(command[4:].lstrip())
                     
         elif unflag_intent == "unflag":
-            split_list = self._convert(command[6:].lstrip())
+            split_list = self._split_str_input(command[6:].lstrip())
                     
         else:
-            split_list = self._convert(command)
+            split_list = self._split_str_input(command)
 
         return flag_intent, unflag_intent, split_list
 
@@ -143,7 +143,7 @@ class Minesweeper:
                     continue
 
                 flag_intent, unflag_intent, split_list = \
-                             self._set_flag_intent(command)
+                             self._process_flag_intent(command)
 
                 if len(split_list) > 2 or not (split_list[0].isnumeric()) \
                    or not (split_list[1].isnumeric()):
@@ -170,7 +170,7 @@ class Minesweeper:
 
                 bomb = self.grid.reveal(x_input - 1, self.grid.dim - y_input)
 
-                if bomb == "bomb revealed":
+                if bomb:
                     pos = 0
                     while pos < self.grid.dim * self.grid.dim:
                         if self.grid.gridlist[pos].has_bomb:
