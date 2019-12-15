@@ -1,2 +1,3 @@
 # Minesweeper
-A text-based version of the game Minesweeper. Includes a scoring system, custom grid sizes, and a flagging mechanic.
+A text-based version of the game Minesweeper. 
+Includes scoring and hint systems, custom grid sizes, and a flagging mechanic.
