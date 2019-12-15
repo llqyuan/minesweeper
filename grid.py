@@ -247,6 +247,13 @@ class Grid:
 
 
     def adj_with_bombs(self, x, y):
+        """
+        Returns the number of squares adjacent to (x, y) (0,0 is top left) which have bombs
+
+        :param x: int. Must be in range
+        :param y: int. Must be in range
+        :return: int
+        """
         adjacent = [(x-1,y-1), (x,y-1), (x+1,y-1),
                     (x-1,y),            (x+1,y),
                     (x-1,y+1), (x,y+1), (x+1,y+1)]
