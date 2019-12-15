@@ -232,10 +232,7 @@ class Grid:
         return num_bombs
 
 
-    def reveal(self, x_input, y_input):
-        xpos = x_input - 1
-        ypos = self.grid_dim - y_input
-
+    def reveal(self, xpos, ypos):
         self.gridlist[ypos * self.grid_dim + xpos].is_revealed = True
 
         if self.gridlist[ypos * self.grid_dim + xpos].has_bomb:
@@ -254,8 +251,9 @@ class Grid:
                                                   and 0 <= pos[1] < self.grid_dim,
                                       adjacent))
             adj_not_revealed = list(
-                filter(lambda pos: not self.gridlist[ypos * self.grid_dim + xpos].is_revealed,
+                filter(lambda pos:
+                       not self.gridlist[pos[1] * self.grid_dim + pos[0]].is_revealed,
                        adj_inrange))
             for pos in adj_not_revealed:
-                self.reveal(pos[0] + 1, self.grid_dim - pos[1])
+                self.reveal(pos[0], pos[1])
 
