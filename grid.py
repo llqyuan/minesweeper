@@ -1,5 +1,4 @@
 import random
-from square import Square
 
 
 CHECK_FONT_MSG = "This is a text-based game.\n\n"\
@@ -59,6 +58,19 @@ SYMBOLS_MSG = \
             "XX : Revealed square has a bomb\n"
 
 
+class Square:
+    '''
+    Fields:
+     * is_revealed (Bool)
+     * has_bomb (Bool)
+     * is_flagged (Bool)
+    '''
+    def __init__(self, rev, bomb, flag):
+        self.is_revealed = rev
+        self.has_bomb = bomb
+        self.is_flagged = flag
+
+
 class Grid:
     
     def __init__(self):
@@ -78,6 +90,7 @@ class Grid:
 
 
     def read_and_store_preferred_grid_dimension(self):
+        global INIT_GRID_SIZE_MSG
         ready = input(INIT_GRID_SIZE_MSG).strip()
         
         while ready.isnumeric():
@@ -139,16 +152,23 @@ class Grid:
 
     def initialize_game(self):
         if not self.is_retry:
+            global CHECK_FONT_MSG
+            global HOW_TO_PLAY_MSG
             ready = input(CHECK_FONT_MSG)
             ready = input(HOW_TO_PLAY_MSG)
 
         self.read_and_store_preferred_grid_dimension()
         self.create_new_grid()
-        
 
-    def play(self):
-        """
-        Return True if the player wishes to replay and False otherwise?
-        """
+
+    def print_grid(self):
+        pass
+
+
+    def adj_with_bombs(xpos, ypos):
+        pass
+
+
+    def reveal(x_input, y_input):
         pass
 
