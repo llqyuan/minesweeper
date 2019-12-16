@@ -169,11 +169,11 @@ class Minesweeper(object):
                 "you wish.\n\n"
                 "Show hint? (y/n) "
                 .format(self.allowed_hints - self.given_hints,
-                        self.allowed_hints)).lower()
+                        self.allowed_hints)).lower().strip()
 
             while show != "y" and show != "n":
                 show = input(
-                    "I didn't understand that. Show hint? (y/n) ").lower()
+                    "I didn't understand that. Show hint? (y/n) ").lower().strip()
 
             if show == "y":
                 self.__process_hint()
