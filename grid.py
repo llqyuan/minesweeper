@@ -1,65 +1,78 @@
 import random
 
 
-CHECK_FONT_MSG = "This is a text-based game.\n\n"\
-                 "+--+--+--+--+--+\n"\
-                 "|  |  |  |  |  |\n"\
-                 "+--+--+--+--+--+\n\n"\
-                 "The above shape should look like a line of five squares.\n"\
-                 "If you do not see the shape, please change your font\n"\
-                 "accordingly (Deja Vu Sans Mono is a good bet).\n\n"\
-                 "Press enter when you are ready.\n"
+CHECK_FONT_MSG = """
+This is a text based game.\n
++--+--+--+--+--+
+|  |  |  |  |  |
++--+--+--+--+--+\n
+The above should look like a line of five squares.
+If you do not see the shape, please change your font until you do.
+Press enter when you are ready.
+"""
 
-HOW_TO_PLAY_MSG = \
-                "\nHOW TO PLAY:\n\n"\
-                "Enter the coordinates of the square you want to reveal.\n\n"\
-                "The coordinates should be of the form 'x,y', where x \n"\
-                "denotes the column number and y denotes the row number.\n"\
-                "For instance, 1,2 denotes the upper left corner on\n"\
-                "a 2x2 grid.\n\n"\
-                "If you reveal a square with a bomb, it's game over.\n\n"\
-                "(Press enter to continue)\n"
+HOW_TO_PLAY_MSG = """
+HOW TO PLAY:
 
-COMMAND_LIST_MSG = \
-                 "\nCOMMANDS:\n\n"\
-                " * To see these instructions again later, enter 'help'.\n"\
-                " * To flag a square, enter your coordinate preceded by 'flag'"\
-                "\n   ('flag 1,1').\n"\
-                " * To unflag a square, enter your coordinate preceded by\n"\
-                "   'unflag' ('unflag 1,1').\n" \
-                " * To reprint the grid, enter 'grid'.\n"\
-                " * To see the meaning of a symbol on the grid, enter "\
-                "'symbols'.\n" \
-                " * To quit, enter 'quit'.\n" \
-                " * To ask for a hint, enter 'hint'.\n\n"
+Enter the coordinates of the square you want to reveal.\n
+The coordinates should be of the form "x, y", where x 
+denotes the column number and y denotes the row number.
+For instance, 1,2 denotes the upper left corner on a 2x2 grid.\n
+If you reveal a square with a bomb, it's game over.\n
+(Press enter to continue)
+"""
 
-INIT_GRID_SIZE_MSG = \
-                   "~~~~~~~~~~~~~~~~~~~~~~~\n\n"\
-                  "Default grid size is 15x15.\n\n" \
-                  "To choose a different grid size, enter a natural number\n"\
-                  "greater than or equal to 2. The grid will be of size nxn,\n" +\
-                  "where n is your inputted number of choice. Excessively\n" \
-                  "large numbers are not recommended, as the grid may be\n"\
-                  "printed weirdly (this is a text based game, after all).\n\n"\
-                  "To proceed with the default size, press enter (or\n"\
-                  "enter anything else that isn't a natural number).\n\n"
+COMMAND_LIST_MSG = """
+COMMANDS:
 
-IMPROPER_COORD_MSG = \
-                   "\nThe coordinate must be of the form 'x,y', where\n"\
-                    "x and y are natural numbers.\n\n"\
-                    "To flag a square (eg. 1,1), enter 'flag 1,1'. To \n"\
-                    "unflag the square 1,1, enter 'unflag 1,1'.\n"
+ * To see these instructions again later, enter "help".
+ * To flag a square, enter your coordinate preceded by "flag"
+   ("flag 1,1").
+ * To unflag a square, enter your coordinate preceded by "unflag"
+   ("unflag 1,1")
+ * To reprint the grid, enter "grid".
+ * To see the meaning of a symbol on the grid, enter "symbols".
+ * To ask for a hint, enter "hint".
+ * To quit, enter "quit".
+ 
+"""
 
-COORD_OUT_OF_RANGE_MSG = \
-                       "\nThat coordinate was out of range.\n"
-SYMBOLS_MSG = \
-            " * : Flagged square\n"\
-            " - : No adjacent squares have a bomb\n"\
-            " 2 : 2 adjacent squares have a bomb\n"\
-            "XX : Revealed square has a bomb\n"
+INIT_GRID_SIZE_MSG = """
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Default grid size is 15x15.
+To choose a different grid size, enter a natural number
+greater than or equal to 2. The grid will be of size nxn, where
+n is your number of choice. Excessively large numbers are not
+recommended, as the grid may be printed weirdly (this is a text
+based game, after all).
+
+To proceed with the default size, press enter (or enter anything
+that isn't a natural number).
+
+"""
+
+IMPROPER_COORD_MSG = """
+The coordinate must be of the form "x,y", where x and y are natural numbers.
+
+To flag a square (eg. 1,1), enter "flag 1,1". To unflag the square,
+enter "unflag 1,1".
+
+"""
+
+COORD_OUT_OF_RANGE_MSG = """
+That coordinate was out of range.
+"""
+
+SYMBOLS_MSG = """
+ * : Flagged square
+ - : No adjacent squares have a bomb
+ 2 : 2 adjacent squares have a bomb
+XX : Revealed square has a bomb
+"""
 
 
-class Square:
+class _Square(object):
     '''
     Fields:
      * is_revealed (Bool)
@@ -72,7 +85,7 @@ class Square:
         self.is_flagged = flag
 
 
-class Grid:
+class Grid(object):
     
     def __init__(self):
         self.is_retry = False
@@ -82,7 +95,7 @@ class Grid:
         self.possible = 0
 
 
-    def create_new_grid(self, n=0.16):
+    def __create_new_grid(self, n=0.16):
         """
         Sets self.gridlist to a newly generated grid of dimension self.dim. Each square has a
         probability n of having a bomb.
@@ -92,13 +105,13 @@ class Grid:
         """
         grid = []
         for i in range(self.dim * self.dim):
-            grid.append(Square(False,
-                               True if random.random() <= n else False,
-                               False))
+            grid.append(_Square(False,
+                                True if random.random() <= n else False,
+                                False))
         self.gridlist = grid
 
 
-    def read_and_store_preferred_grid_dimension(self):
+    def __read_and_store_preferred_grid_dimension(self):
         """
         Reads input and sets self.dim.
         """
@@ -175,12 +188,13 @@ class Grid:
         if not self.is_retry:
             global CHECK_FONT_MSG
             global HOW_TO_PLAY_MSG
+            global COMMAND_LIST_MSG
             ready = input(CHECK_FONT_MSG)
             ready = input(HOW_TO_PLAY_MSG)
             ready = input(COMMAND_LIST_MSG)
 
-        self.read_and_store_preferred_grid_dimension()
-        self.create_new_grid()
+        self.__read_and_store_preferred_grid_dimension()
+        self.__create_new_grid()
 
         self.possible = 0
         self.revealed = 0
@@ -215,26 +229,31 @@ class Grid:
             while xpos < self.dim:
 
                 s += "|"
-                if self.gridlist[ypos * self.dim + xpos].is_revealed:
+                
+                if self.gridlist[ypos * self.dim + xpos].is_revealed and \
+                   self.gridlist[ypos * self.dim + xpos].has_bomb:
                     
-                    if self.gridlist[ypos * self.dim + xpos].has_bomb:
-                        s += "XX"
-                        
+                    s += "XX"
+
+                elif self.gridlist[ypos * self.dim + xpos].is_revealed:
+                    
+                    num_adj_bombs = self.__adj_with_bombs(xpos, ypos)
+                    
+                    if num_adj_bombs == 0:
+                        s += "*-" \
+                             if self.gridlist[ypos * self.dim + xpos].is_flagged \
+                             else " -"
+
                     else:
-                        num_adj_bombs = self.adj_with_bombs(xpos, ypos)
-                        if num_adj_bombs == 0:
-                            s += "*-" \
-                                 if self.gridlist[ypos * self.dim + xpos].is_flagged \
-                                 else " -"
-                            
-                        else:
-                            s += "{}{}".format(
-                                "*" if self.gridlist[ypos * self.dim + xpos].is_flagged
-                                else " ",
-                                num_adj_bombs)
+                        s += "{}{}".format(
+                            "*" \
+                            if self.gridlist[ypos * self.dim + xpos].is_flagged \
+                            else " ",
+                            num_adj_bombs)
 
                 else:
-                    s += "* " if self.gridlist[ypos * self.dim + xpos].is_flagged \
+                    s += "* " \
+                         if self.gridlist[ypos * self.dim + xpos].is_flagged \
                          else "  "
 
                 xpos += 1
@@ -248,7 +267,7 @@ class Grid:
         print(s)
 
 
-    def adj_with_bombs(self, x, y):
+    def __adj_with_bombs(self, x, y):
         """
         Returns the number of squares adjacent to (x, y) (0,0 is top left) which have bombs
 
@@ -297,7 +316,7 @@ class Grid:
         self.gridlist[ypos * self.dim + xpos].is_revealed = True
         self.revealed += 1
 
-        if self.adj_with_bombs(xpos, ypos) == 0:
+        if self.__adj_with_bombs(xpos, ypos) == 0:
             adjacent = [ (xpos - 1,  ypos - 1),
                          (xpos,      ypos - 1),
                          (xpos + 1,  ypos - 1),
