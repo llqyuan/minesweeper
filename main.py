@@ -273,12 +273,11 @@ class Minesweeper(object):
                     continue_playing = self.__try_replay()
                     break
 
-                else:
-                    if self.grid.revealed == self.grid.possible:
-                        self.grid.print_grid()
-                        self.__show_results()
-                        continue_playing = self.__try_replay()
-                        break
+                elif self.grid.revealed == self.grid.possible:
+                    self.grid.print_grid()
+                    self.__show_results()
+                    continue_playing = self.__try_replay()
+                    break
 
                 print("\n")
                 self.grid.print_grid()
