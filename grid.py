@@ -62,7 +62,6 @@ enter "unflag 1,1".
 
 COORD_OUT_OF_RANGE_MSG = """
 That coordinate was out of range.
-
 """
 
 SYMBOLS_MSG = """
@@ -73,7 +72,7 @@ XX : Revealed square has a bomb
 """
 
 
-class Square:
+class _Square(object):
     '''
     Fields:
      * is_revealed (Bool)
@@ -86,7 +85,7 @@ class Square:
         self.is_flagged = flag
 
 
-class Grid:
+class Grid(object):
     
     def __init__(self):
         self.is_retry = False
@@ -96,7 +95,7 @@ class Grid:
         self.possible = 0
 
 
-    def create_new_grid(self, n=0.16):
+    def __create_new_grid(self, n=0.16):
         """
         Sets self.gridlist to a newly generated grid of dimension self.dim. Each square has a
         probability n of having a bomb.
@@ -106,13 +105,13 @@ class Grid:
         """
         grid = []
         for i in range(self.dim * self.dim):
-            grid.append(Square(False,
-                               True if random.random() <= n else False,
-                               False))
+            grid.append(_Square(False,
+                                True if random.random() <= n else False,
+                                False))
         self.gridlist = grid
 
 
-    def read_and_store_preferred_grid_dimension(self):
+    def __read_and_store_preferred_grid_dimension(self):
         """
         Reads input and sets self.dim.
         """
@@ -189,12 +188,13 @@ class Grid:
         if not self.is_retry:
             global CHECK_FONT_MSG
             global HOW_TO_PLAY_MSG
+            global COMMAND_LIST_MSG
             ready = input(CHECK_FONT_MSG)
             ready = input(HOW_TO_PLAY_MSG)
             ready = input(COMMAND_LIST_MSG)
 
-        self.read_and_store_preferred_grid_dimension()
-        self.create_new_grid()
+        self.__read_and_store_preferred_grid_dimension()
+        self.__create_new_grid()
 
         self.possible = 0
         self.revealed = 0
@@ -229,26 +229,31 @@ class Grid:
             while xpos < self.dim:
 
                 s += "|"
-                if self.gridlist[ypos * self.dim + xpos].is_revealed:
+                
+                if self.gridlist[ypos * self.dim + xpos].is_revealed and \
+                   self.gridlist[ypos * self.dim + xpos].has_bomb:
                     
-                    if self.gridlist[ypos * self.dim + xpos].has_bomb:
-                        s += "XX"
-                        
+                    s += "XX"
+
+                elif self.gridlist[ypos * self.dim + xpos].is_revealed:
+                    
+                    num_adj_bombs = self.__adj_with_bombs(xpos, ypos)
+                    
+                    if num_adj_bombs == 0:
+                        s += "*-" \
+                             if self.gridlist[ypos * self.dim + xpos].is_flagged \
+                             else " -"
+
                     else:
-                        num_adj_bombs = self.adj_with_bombs(xpos, ypos)
-                        if num_adj_bombs == 0:
-                            s += "*-" \
-                                 if self.gridlist[ypos * self.dim + xpos].is_flagged \
-                                 else " -"
-                            
-                        else:
-                            s += "{}{}".format(
-                                "*" if self.gridlist[ypos * self.dim + xpos].is_flagged
-                                else " ",
-                                num_adj_bombs)
+                        s += "{}{}".format(
+                            "*" \
+                            if self.gridlist[ypos * self.dim + xpos].is_flagged \
+                            else " ",
+                            num_adj_bombs)
 
                 else:
-                    s += "* " if self.gridlist[ypos * self.dim + xpos].is_flagged \
+                    s += "* " \
+                         if self.gridlist[ypos * self.dim + xpos].is_flagged \
                          else "  "
 
                 xpos += 1
@@ -262,7 +267,7 @@ class Grid:
         print(s)
 
 
-    def adj_with_bombs(self, x, y):
+    def __adj_with_bombs(self, x, y):
         """
         Returns the number of squares adjacent to (x, y) (0,0 is top left) which have bombs
 
@@ -311,7 +316,7 @@ class Grid:
         self.gridlist[ypos * self.dim + xpos].is_revealed = True
         self.revealed += 1
 
-        if self.adj_with_bombs(xpos, ypos) == 0:
+        if self.__adj_with_bombs(xpos, ypos) == 0:
             adjacent = [ (xpos - 1,  ypos - 1),
                          (xpos,      ypos - 1),
                          (xpos + 1,  ypos - 1),
