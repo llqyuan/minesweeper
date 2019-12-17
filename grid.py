@@ -7,7 +7,7 @@ This is a text based game.\n
 |  |  |  |  |  |
 +--+--+--+--+--+\n
 The above should look like a line of five squares.
-If you do not see the shape, please change your font until you do.
+If you do not see the shape, please change your font accordingly.
 Press enter when you are ready.
 """
 
