@@ -280,15 +280,12 @@ class Grid(object):
                     (x-1,y+1), (x,y+1), (x+1,y+1)]
         num_bombs = 0
 
-        debug = []
-
         for pos in adjacent:
             xnew = pos[0]
             ynew = pos[1]
             if xnew in range(self.dim) and ynew in range(self.dim) and \
                self.gridlist[ynew * self.dim + xnew].has_bomb:
                 num_bombs += 1
-                debug.append((xnew + 1, self.dim - ynew))
 
         return num_bombs
 
