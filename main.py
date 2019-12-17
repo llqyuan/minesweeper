@@ -173,7 +173,8 @@ class Minesweeper(object):
 
             while show != "y" and show != "n":
                 show = input(
-                    "I didn't understand that. Show hint? (y/n) ").lower().strip()
+                    "I didn't understand that. Show hint? (y/n) ")\
+                    .lower().strip()
 
             if show == "y":
                 self.__process_hint()
@@ -196,42 +197,42 @@ class Minesweeper(object):
             self.grid.print_grid()
             self.__set_hints()
             
-            command = input().strip()
+            command = input().strip().lower()
 
             while 1:
                 
-                if command.lower() == "help":
+                if command == "help":
                     print(COMMAND_LIST_MSG)
-                    command = input().strip()
+                    command = input().strip().lower()
                     continue
                     
-                elif command.lower() == "quit":
+                elif command == "quit":
                     print("Bye.")
                     return
                 
-                elif command.lower() == "grid":
+                elif command == "grid":
                     print("\n")
                     self.grid.print_grid()
-                    command = input().strip()
+                    command = input().strip().lower()
                     continue
 
-                elif command.lower() == "symbols":
+                elif command == "symbols":
                     print(SYMBOLS_MSG)
-                    command = input().strip()
+                    command = input().strip().lower()
                     continue
 
-                elif command.lower() == "hint":
+                elif command == "hint":
                     self.__show_hints()
                     if self.grid.revealed == self.grid.possible:
                         self.__show_results()
                         continue_playing = self.__try_replay()
                         break
-                    command = input().strip()
+                    command = input().strip().lower()
                     continue
 
                 elif "," not in command:
                     print(IMPROPER_COORD_MSG)
-                    command = input().strip()
+                    command = input().strip().lower()
                     continue
 
                 flag_intent, unflag_intent, split_list = \
@@ -240,7 +241,7 @@ class Minesweeper(object):
                 if len(split_list) > 2 or not (split_list[0].isnumeric()) \
                    or not (split_list[1].isnumeric()):
                     print(IMPROPER_COORD_MSG)
-                    command= input().strip()
+                    command= input().strip().lower()
                     continue
                 
                 x_input, y_input = int(split_list[0]), int(split_list[1])
@@ -248,7 +249,7 @@ class Minesweeper(object):
                 if not (1 <= x_input <= self.grid.dim and \
                         1 <= y_input <= self.grid.dim):
                     print(COORD_OUT_OF_RANGE_MSG)
-                    command = input().strip()
+                    command = input().strip().lower()
                     continue
 
                 elif flag_intent == "flag" or unflag_intent == "unflag":
@@ -257,7 +258,7 @@ class Minesweeper(object):
                                     else False)
                     print("\n")
                     self.grid.print_grid()
-                    command = input().strip()
+                    command = input().strip().lower()
                     continue
 
                 bomb = self.grid.reveal(x_input - 1, self.grid.dim - y_input)
@@ -281,7 +282,7 @@ class Minesweeper(object):
 
                 print("\n")
                 self.grid.print_grid()
-                command = input().strip()
+                command = input().strip().lower()
 
 m = Minesweeper()
 m.play()

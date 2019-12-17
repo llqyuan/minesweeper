@@ -131,16 +131,16 @@ class Grid(object):
 
                 check = input(
                     "\nThat's a pretty large number, you want to continue? "
-                    "(y/n) ").strip()
+                    "(y/n) ").strip().lower()
 
-                while check.lower() != "y" and check.lower() != "n":
+                while check != "y" and check != "n":
                     check = input(
                         "I didn't understand that. Do you want to play with "
                         "a grid size of {0} by {0}? (Enter 'y' or 'n') "
                         .format(ready))\
-                        .strip()
+                        .strip().lower()
 
-                if check.lower() == "y":
+                if check == "y":
                     self.dim = int(ready)
                     break
                 
@@ -151,16 +151,16 @@ class Grid(object):
                 check = input(
                     "\nThat's a REALLY large number, you want to continue? "
                     "(y/n) ")\
-                    .strip()
+                    .strip().lower()
 
-                while check.lower() != "y" and check.lower() != "n":
+                while check != "y" and check != "n":
                     check = input(
                         "\nI didn't understand that. Do you want to play "
                         "with a grid size of {0} by {0}? (Enter 'y' or 'n') "
                         .format(ready))\
-                        .strip()
+                        .strip().lower()
 
-                if check.lower() == "y":
+                if check == "y":
                     self.dim = int(ready)
                     break
 
