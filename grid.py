@@ -95,7 +95,7 @@ class Grid(object):
         self.possible = 0
 
 
-    def __create_new_grid(self, n=0.16):
+    def _create_new_grid(self, n=0.16):
         """
         Sets self.gridlist to a newly generated grid of dimension self.dim. Each square has a
         probability n of having a bomb.
@@ -111,7 +111,7 @@ class Grid(object):
         self.gridlist = grid
 
 
-    def __read_and_store_preferred_grid_dimension(self):
+    def _read_and_store_preferred_grid_dimension(self):
         """
         Reads input and sets self.dim.
         """
@@ -193,8 +193,8 @@ class Grid(object):
             ready = input(HOW_TO_PLAY_MSG)
             ready = input(COMMAND_LIST_MSG)
 
-        self.__read_and_store_preferred_grid_dimension()
-        self.__create_new_grid()
+        self._read_and_store_preferred_grid_dimension()
+        self._create_new_grid()
 
         self.possible = 0
         self.revealed = 0
@@ -237,7 +237,7 @@ class Grid(object):
 
                 elif self.gridlist[ypos * self.dim + xpos].is_revealed:
                     
-                    num_adj_bombs = self.__adj_with_bombs(xpos, ypos)
+                    num_adj_bombs = self._adj_with_bombs(xpos, ypos)
                     
                     if num_adj_bombs == 0:
                         s += "*-" \
@@ -267,7 +267,7 @@ class Grid(object):
         print(s)
 
 
-    def __adj_with_bombs(self, x, y):
+    def _adj_with_bombs(self, x, y):
         """
         Returns the number of squares adjacent to (x, y) (0,0 is top left) which have bombs
 
@@ -313,7 +313,7 @@ class Grid(object):
         self.gridlist[ypos * self.dim + xpos].is_revealed = True
         self.revealed += 1
 
-        if self.__adj_with_bombs(xpos, ypos) == 0:
+        if self._adj_with_bombs(xpos, ypos) == 0:
             adjacent = [ (xpos - 1,  ypos - 1),
                          (xpos,      ypos - 1),
                          (xpos + 1,  ypos - 1),
