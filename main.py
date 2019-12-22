@@ -1,4 +1,5 @@
-from grid import *
+from grid import Grid
+from messages import *
 import random
 
 
